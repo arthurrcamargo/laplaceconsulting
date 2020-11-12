@@ -1,0 +1,59 @@
+#Python Gestão de Portfolio
+
+import pandas as pd
+import numpy as np
+from pandas_datareader import data as wb
+import matplotlib.pyplot as plt
+from datetime import datetime
+
+#Risco Individual do Ativo ITSA.4
+itau_prices = wb.DataReader('ITSA4.SA', data_source = 'yahoo', start='2019-1-1')
+itau_prices.head()
+
+#renomeia a coluna adj close
+itau_prices.rename(columns = {"Adj Close":"ITAU"}, inplace = True)
+
+#remove as colunas 
+itau = itau_prices.drop(itau_prices.columns[[0,1,2,3,4]], axis =1)
+
+#plota o grafico de preços
+itau.plot()
+
+#volatilidade diária
+vol_itau = np.std(itau['ITAU'])
+print(volatilidade_diaria)
+
+#VaR Parametrico
+
+from scipy.stats import norm
+
+#declarar variavel media
+media = np.mean(itau_retornos['ITAU'])
+
+#variaveis de nível de confiança
+conf_90 = 0.1
+conf_95 = 0.05
+conf_99 = 0.01
+
+#calcular o VaR
+VaR_90 = norm.ppf(conf_90, media, vol_itau)
+VaR_95 = norm.ppf(conf_95, media, vol_itau)
+VaR_99 = norm.ppf(conf_99, media, vol_itau)
+
+print(VaR_99)
+    
+
+#VaR Simulação de Monte Carlo 
+
+retornos_simulados = []
+dias_trade = 252
+
+
+for i in range (1000):
+    sim_retornos = np.random.normal(media, vol_itau, dias_trade)
+    
+retornos_simulados.append(sim_retornos)
+
+var_99 = np.percentile(retornos_simulados,1)
+
+print(var_99)
